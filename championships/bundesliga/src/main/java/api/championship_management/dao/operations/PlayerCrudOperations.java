@@ -17,6 +17,7 @@ import java.util.List;
 @Repository
 @RequiredArgsConstructor
 public class PlayerCrudOperations {
+<<<<<<< Updated upstream
     private  DataSource dataSource;
     private PlayerMapper playerMapper;
 
@@ -39,4 +40,7 @@ public class PlayerCrudOperations {
             throw new RuntimeException(e);
         }
     }
+=======
+
+>>>>>>> Stashed changes
 }
