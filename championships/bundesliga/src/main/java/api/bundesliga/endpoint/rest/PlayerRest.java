@@ -1,4 +1,4 @@
-package api.bundesliga.entity;
+package api.bundesliga.endpoint.rest;
 
 import api.bundesliga.entity.Club;
 import api.bundesliga.entity.PlayerPosition;
@@ -13,12 +13,11 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Data
-public class Player {
+public class PlayerRest {
     private String id;
     private String name;
     private Integer number;
     private String nationality;
     private Integer age;
     private PlayerPosition playerPosition;
-    private Club club;
 }

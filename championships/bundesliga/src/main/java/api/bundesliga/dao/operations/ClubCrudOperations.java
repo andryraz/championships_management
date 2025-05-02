@@ -4,6 +4,7 @@ import api.bundesliga.dao.DataSource;
 import api.bundesliga.dao.mapper.ClubMapper;
 import api.bundesliga.dao.mapper.PlayerMapper;
 import api.bundesliga.dao.mapper.StatClubMapper;
+import api.bundesliga.endpoint.mapper.PlayerRestMapper;
 import api.bundesliga.entity.Club;
 import api.bundesliga.entity.Player;
 import api.bundesliga.entity.StatClub;
@@ -17,6 +18,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 
@@ -26,6 +28,7 @@ public class ClubCrudOperations {
     private final ClubMapper clubMapper;
     private final StatClubMapper statClubMapper;
     private final PlayerMapper playerMapper;
+    private final PlayerRestMapper playerRestMapper;
 
     public List<Club> getAll(int page, int size) {
         List<Club> clubs = new ArrayList<>();
@@ -133,4 +136,72 @@ public class ClubCrudOperations {
             throw new RuntimeException(e);
         }
     }
+
+    public boolean existsClubById(String clubId) {
+        String sql = "SELECT 1 FROM club WHERE id = ?::uuid";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, clubId);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to verify club existence", e);
+        }
+    }
+    public boolean existsPlayerInAnotherClub(String playerId, String currentClubId) {
+        String sql = "SELECT club_id FROM player WHERE id = ?::uuid";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, playerId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                String clubId = rs.getString("club_id");
+                return clubId != null && !clubId.equals(currentClubId);
+            }
+            return false;
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to check player club association", e);
+        }
+    }
+
+    public void detachAllPlayersFromClub(String clubId) {
+        String sql = "UPDATE player SET club_id = NULL WHERE club_id = ?::uuid";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, clubId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to detach players from club", e);
+        }
+    }
+
+    public void saveOrUpdatePlayer(Player p) {
+        String sql = "INSERT INTO player (id, name, number, age, nationality, position, club_id) " +
+                "VALUES (?::uuid, ?, ?, ?, ?, ?::player_position, ?::uuid) " +
+                "ON CONFLICT (id) DO UPDATE SET " +
+                "name = EXCLUDED.name, number = EXCLUDED.number, age = EXCLUDED.age, " +
+                "nationality = EXCLUDED.nationality, position = EXCLUDED.position, club_id = EXCLUDED.club_id";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            if (p.getId() == null) {
+                p.setId(UUID.randomUUID().toString());
+            }
+
+            stmt.setString(1, p.getId());
+            stmt.setString(2, p.getName());
+            stmt.setInt(3, p.getNumber());
+            stmt.setInt(4, p.getAge());
+            stmt.setString(5, p.getNationality());
+            stmt.setString(6, p.getPlayerPosition().name());
+            stmt.setString(7, p.getClub().getId());
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to save or update player", e);
+        }
+    }
+
+
 }

@@ -1,5 +1,6 @@
 package api.bundesliga.endpoint;
 
+import api.bundesliga.endpoint.rest.PlayerRest;
 import api.bundesliga.entity.Club;
 
 import api.bundesliga.entity.Player;
@@ -57,6 +58,14 @@ public class ClubController {
         List<StatClub> statclubs = clubService.getStatForSpecificSeason(seasonYear);
         return ResponseEntity.ok(statclubs);
     }
+
+    @PutMapping("/clubs/{id}/players")
+    public ResponseEntity<List<PlayerRest>> replaceClubPlayers(
+            @PathVariable String id,
+            @RequestBody List<PlayerRest> players) {
+        return ResponseEntity.ok(clubService.replacePlayers(id, players));
+    }
+
 
 //    @PostMapping("/player")
 //    public ResponseEntity<Object> saveDish(@RequestBody List<Player> players) {
