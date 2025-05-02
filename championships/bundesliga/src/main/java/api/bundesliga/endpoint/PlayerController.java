@@ -28,8 +28,8 @@ public class PlayerController {
         return ResponseEntity.ok(players);
     }
 
-    @PostMapping("/player")
-    public ResponseEntity<Object> saveDish(@RequestBody List<Player> players) {
+    @PutMapping("/player")
+    public ResponseEntity<Object> savePlayers(@RequestBody List<Player> players) {
         try {
             return ResponseEntity.ok().body(playerService.saveAll(players));
         } catch (ClientException e) {

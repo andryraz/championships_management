@@ -77,7 +77,7 @@ public class PlayerCrudOperations {
 
     public StatPlayer findByIdPlayer(String player_id, Integer seasonYear) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT ps.scored_goals, ps.playing_time_seconds FROM player_statistics ps JOIN player p on ps.player_id=p.id JOIN season s on s.id=ps.season_id where ps.player_id= ?::uuid and s.year= ?")) {
+             PreparedStatement statement = connection.prepareStatement("SELECT ps.scored_goals, ps.playing_time_seconds FROM player_statistics ps JOIN player p on ps.player_id = p.id JOIN season s on s.id=ps.season_id where ps.player_id= ?::uuid and s.year= ?")) {
             statement.setString(1, player_id);
             statement.setInt(2, seasonYear);
             try (ResultSet resultSet = statement.executeQuery()) {

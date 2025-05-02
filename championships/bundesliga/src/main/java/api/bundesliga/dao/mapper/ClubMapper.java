@@ -17,7 +17,6 @@ public class ClubMapper implements Function<ResultSet, Club> {
 
         Club club = new Club();
         club.setId(resultSet.getString("id"));
-        club.setId(resultSet.getString("id"));
         club.setName(resultSet.getString("name"));
         club.setYear_creation(resultSet.getInt("year_creation"));
         club.setAcronym(resultSet.getString("acronym"));
