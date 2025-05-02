@@ -6,6 +6,7 @@ import api.bundesliga.dao.operations.PlayerCrudOperations;
 import api.bundesliga.entity.Club;
 import api.bundesliga.entity.Player;
 
+import api.bundesliga.entity.StatClub;
 import api.bundesliga.entity.StatPlayer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,6 @@ public class ClubService {
 //    public List<Player> saveAll(List<Player> players) {
 //        return playerCrudOperations.saveAll(players);
 //    }
-//
+
 
 }

@@ -2,6 +2,7 @@ package api.bundesliga.dao.mapper;
 
 import api.bundesliga.entity.Player;
 import api.bundesliga.entity.PlayerPosition;
+import api.bundesliga.entity.StatClub;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -34,6 +35,5 @@ public class StatClubMapper implements  Function<ResultSet, StatClub>{
 
         return statClub;
     }
-
 
 }
