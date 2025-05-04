@@ -6,6 +6,7 @@ import api.bundesliga.entity.Player;
 import api.bundesliga.dao.mapper.PlayerMapper;
 import api.bundesliga.dao.mapper.StatPlayerMapper;
 //import api.bundesliga.dao.mapper.Player;
+import api.bundesliga.entity.PlayerMin;
 import api.bundesliga.entity.StatPlayer;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -17,6 +18,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -90,5 +93,43 @@ public class PlayerCrudOperations {
             throw new RuntimeException(e);
         }
     }
+
+    public Optional<PlayerMin> findPlayerByIdentifier(String identifier) {
+        String query = "SELECT id, name, number FROM player WHERE id = ?::uuid OR name = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, identifier);
+            stmt.setString(2, identifier);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return Optional.of(new PlayerMin(
+                        rs.getString("id"),
+                        rs.getString("name"),
+                        rs.getInt("number")
+                ));
+            }
+            return Optional.empty();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors de la recherche du joueur", e);
+        }
+    }
+
+    public void incrementPlayerGoals(String playerId) {
+        String query = "UPDATE player_statistics SET scored_goals = scored_goals + 1 WHERE player_id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setObject(1, UUID.fromString(playerId));
+            int affected = stmt.executeUpdate();
+            if (affected == 0) {
+                throw new RuntimeException("Statistiques du joueur non trouvées");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors de la mise à jour des statistiques du joueur", e);
+        }
+    }
+
+
 
 }
