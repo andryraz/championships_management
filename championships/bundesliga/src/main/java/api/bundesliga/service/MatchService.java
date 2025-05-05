@@ -131,4 +131,12 @@ public class MatchService {
         return null;
     }
 
+
+    public List<Match> findBySeason(int seasonYear,
+                                    MatchStatus status,
+                                    String clubName,
+                                    LocalDate after,
+                                    LocalDate beforeOrEquals) {
+        return matchCrudOperations.findBySeasonWithFilters(seasonYear, status, clubName, after, beforeOrEquals);
+    }
 }
