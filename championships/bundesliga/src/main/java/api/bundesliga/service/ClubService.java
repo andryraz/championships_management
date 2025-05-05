@@ -67,6 +67,10 @@ public class ClubService {
 //        return clubCrudOperations.findPlayerByIdClub(clubId);
     }
 
+    public List<StatClub> getStat() {
+        return clubCrudOperations.getStat();
+    }
+
 //    public List<PlayerRest> replacePlayers(String clubId, List<PlayerRest> players);
 //    public List<Player> saveAll(List<Player> players) {
 //        return playerCrudOperations.saveAll(players);

@@ -2,6 +2,8 @@ package api.bundesliga.dao.operations;
 
 
 import api.bundesliga.dao.DataSource;
+import api.bundesliga.endpoint.mapper.StatsPlayersMapper;
+import api.bundesliga.endpoint.rest.StatPlayerRest;
 import api.bundesliga.entity.Player;
 import api.bundesliga.dao.mapper.PlayerMapper;
 import api.bundesliga.dao.mapper.StatPlayerMapper;
@@ -27,6 +29,7 @@ public class PlayerCrudOperations {
     private  final DataSource dataSource;
     private final PlayerMapper playerMapper;
     private final StatPlayerMapper statplayerMapper;
+    private final StatsPlayersMapper statsplayersMapper;
 
     public List<Player> getAll(int page, int size) {
         List<Player> players = new ArrayList<>();
@@ -127,6 +130,21 @@ public class PlayerCrudOperations {
             }
         } catch (SQLException e) {
             throw new RuntimeException("Erreur lors de la mise à jour des statistiques du joueur", e);
+        }
+    }
+
+    public StatPlayerRest getStat() {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT p.id, p.name, p.number, p.position, p.nationality, p.age, ps.scored_goals, ps.playing_time_seconds FROM player_statistics ps JOIN player p on ps.player_id = p.id JOIN season s on s.id=ps.season_id")) {
+           ;
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return statsplayersMapper.apply(resultSet);
+                }
+            }
+            throw new RuntimeException("Error");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 

@@ -66,6 +66,12 @@ public class ClubController {
         return ResponseEntity.ok(clubService.replacePlayers(id, players));
     }
 
+    @GetMapping("/clubs/statistics")
+    public ResponseEntity<List<StatClub>> getStatClub() {
+        List<StatClub> statclubs = clubService.getStat();
+        return ResponseEntity.ok(statclubs);
+    }
+
 
 //    @PostMapping("/player")
 //    public ResponseEntity<Object> saveDish(@RequestBody List<Player> players) {

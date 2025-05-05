@@ -3,6 +3,7 @@ package api.bundesliga.service;
 
 import api.bundesliga.dao.operations.PlayerCrudOperations;
 
+import api.bundesliga.endpoint.rest.StatPlayerRest;
 import api.bundesliga.entity.Player;
 import api.bundesliga.entity.StatPlayer;
 import lombok.RequiredArgsConstructor;
@@ -25,5 +26,9 @@ public class PlayerService {
 
     public StatPlayer getStatPlayer(String player_id, Integer seasonYear) {
         return playerCrudOperations.findByIdPlayer(player_id, seasonYear);
+    }
+
+    public StatPlayerRest getStat() {
+        return playerCrudOperations.getStat();
     }
 }

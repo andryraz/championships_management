@@ -203,5 +203,22 @@ public class ClubCrudOperations {
         }
     }
 
+    public List<StatClub> getStat () {
+        List<StatClub> statclubs = new ArrayList<>();
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "SELECT c.id, c.name, c.acronym, c.stadium, c.year_creation, c.coach_name, c.coach_nationality, cs.ranking_points, cs.scored_goals, cs.conceded_goals, cs.difference_goals, cs.clean_sheet_number FROM club_statistics cs JOIN club c ON c.id = cs.club_id JOIN season s ON s.id = cs.season_id")) {
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    statclubs.add(statClubMapper.apply(resultSet));
+                }
+            }
+            return statclubs;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
 }

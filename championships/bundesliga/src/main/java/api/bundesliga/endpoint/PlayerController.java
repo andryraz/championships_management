@@ -1,6 +1,7 @@
 package api.bundesliga.endpoint;
 
 
+import api.bundesliga.endpoint.rest.StatPlayerRest;
 import api.bundesliga.entity.Player;
 import api.bundesliga.entity.StatPlayer;
 import api.bundesliga.service.PlayerService;
@@ -47,6 +48,11 @@ public class PlayerController {
             @PathVariable("seasonYear") Integer seasonYear
     ) {
         return ResponseEntity.ok(playerService.getStatPlayer(player_id, seasonYear));
+    }
+
+    @GetMapping("/players/statistics")
+    public ResponseEntity<StatPlayerRest> getStatPlayer() {
+        return ResponseEntity.ok(playerService.getStat());
     }
 
 }
