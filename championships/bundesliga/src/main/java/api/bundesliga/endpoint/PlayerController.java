@@ -51,7 +51,7 @@ public class PlayerController {
     }
 
     @GetMapping("/players/statistics")
-    public ResponseEntity<StatPlayerRest> getStatPlayer() {
+    public ResponseEntity<List<StatPlayerRest>> getStatPlayer() {
         return ResponseEntity.ok(playerService.getStat());
     }
 

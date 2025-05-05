@@ -28,7 +28,7 @@ public class PlayerService {
         return playerCrudOperations.findByIdPlayer(player_id, seasonYear);
     }
 
-    public StatPlayerRest getStat() {
+    public List<StatPlayerRest> getStat() {
         return playerCrudOperations.getStat();
     }
 }

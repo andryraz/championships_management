@@ -9,6 +9,7 @@ import api.bundesliga.dao.mapper.PlayerMapper;
 import api.bundesliga.dao.mapper.StatPlayerMapper;
 //import api.bundesliga.dao.mapper.Player;
 import api.bundesliga.entity.PlayerMin;
+import api.bundesliga.entity.StatClub;
 import api.bundesliga.entity.StatPlayer;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -133,16 +134,17 @@ public class PlayerCrudOperations {
         }
     }
 
-    public StatPlayerRest getStat() {
+    public List<StatPlayerRest> getStat() {
+        List<StatPlayerRest> statPlayerRest = new ArrayList<>();
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT p.id, p.name, p.number, p.position, p.nationality, p.age, ps.scored_goals, ps.playing_time_seconds FROM player_statistics ps JOIN player p on ps.player_id = p.id JOIN season s on s.id=ps.season_id")) {
            ;
             try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return statsplayersMapper.apply(resultSet);
+                while (resultSet.next()) {
+                    statPlayerRest.add(statsplayersMapper.apply(resultSet));
                 }
             }
-            throw new RuntimeException("Error");
+            return statPlayerRest;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
