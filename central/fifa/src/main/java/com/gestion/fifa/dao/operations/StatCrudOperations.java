@@ -2,6 +2,7 @@ package com.gestion.fifa.dao.operations;
 
 
 import com.gestion.fifa.dao.DataSource;
+
 import com.gestion.fifa.entity.StatClub;
 import com.gestion.fifa.entity.StatPlayer;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ import java.util.UUID;
 @Repository
 @RequiredArgsConstructor
 public class StatCrudOperations {
-   private final DataSource dataSource;
+    private final DataSource dataSource;
 
     public void deletePlayerStats() {
         String sql = "DELETE FROM player_stats";
@@ -88,4 +89,3 @@ public class StatCrudOperations {
         }
     }
 }
-

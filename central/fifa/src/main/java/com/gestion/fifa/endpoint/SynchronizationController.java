@@ -20,9 +20,7 @@ public class SynchronizationController {
 
     @PostMapping
     public ResponseEntity<Void> synchronize() {
-        for (SynchronizationRequest request : requests) {
-            synchronizationService.synchronizeData(request);
-        }
+            synchronizationService.synchronizeData();
         return ResponseEntity.ok().build();
     }
 }

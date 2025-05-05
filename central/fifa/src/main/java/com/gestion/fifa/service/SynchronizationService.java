@@ -3,7 +3,6 @@ package com.gestion.fifa.service;
 import com.gestion.fifa.dao.operations.StatCrudOperations;
 import com.gestion.fifa.entity.StatClub;
 import com.gestion.fifa.entity.StatPlayer;
-import com.gestion.fifa.entity.SynchronizationRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +15,7 @@ public class SynchronizationService {
     private final StatCrudOperations statCrudOperations;
     private final ChampionshipClient championshipClient;
 
-    public void synchronizeData(SynchronizationRequest request) {
+    public void synchronizeData() {
 //        Integer seasonYear = request.getSeasonYear();
 
         // 1. Appels aux API des championnats
