@@ -1,10 +1,10 @@
 package com.gestion.fifa.service;
 
-
 import com.gestion.fifa.dao.operations.PlayerCrudOperations;
-import com.gestion.fifa.entity.Player;
-import com.gestion.fifa.entity.PlayerRanking;
-import com.gestion.fifa.util.DurationUnit;
+import com.gestion.fifa.dto.DurationUnit;
+import com.gestion.fifa.dto.PlayerRanking;
+import com.gestion.fifa.dto.PlayingTime;
+import com.gestion.fifa.entity.StatPlayer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,21 +15,44 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class PlayerService {
-    private final PlayerCrudOperations repository;
+    private final PlayerCrudOperations repo;
+
 
     public List<PlayerRanking> getBestPlayers(int top, DurationUnit unit) {
-        List<Player> all = repository.findAllPlayers();
-
-        return all.stream()
-                .sorted(Comparator.comparingInt(Player::getScoredGoals).reversed()
-                        .thenComparingLong(Player::getTotalPlayingTimeSeconds).reversed())
+        // 1. Récupère tous
+        List<StatPlayer> all = repo.findAll();
+        // 2. Trie par scored_goals DESC, puis playing_time DESC
+        List<StatPlayer> sorted = all.stream()
+                .sorted(Comparator
+                        .comparingInt(StatPlayer::getScored_goals).reversed()
+                        .thenComparingLong(StatPlayer::getPlaying_time_seconds).reversed()
+                )
                 .limit(top)
-                .map(player -> new PlayerRanking(
-                        player.getName(),
-                        player.getScoredGoals(),
-                        unit.convert(player.getTotalPlayingTimeSeconds()),
-                        player.getChampionshipName()
-                ))
+                .collect(Collectors.toList());
+        // 3. Map vers DTO avec rank et conversion d’unités
+        return sorted.stream()
+                .map(p -> {
+                    long raw = p.getPlaying_time_seconds();
+                    long converted;
+                    switch (unit) {
+                        case MINUTE: converted = raw / 60; break;
+                        case HOUR:   converted = raw / 3600; break;
+                        default:     converted = raw;
+                    }
+                    int idx = sorted.indexOf(p) + 1;
+                    return PlayerRanking.builder()
+                            .rank(idx)
+                            .id(p.getId())
+                            .name(p.getName())
+                            .number(p.getNumber() == null ? 0 : p.getNumber())
+                            .position(p.getPlayerPosition().name())
+                            .nationality(p.getNationality())
+                            .age(p.getAge())
+                            .championship(p.getChampionshipName())
+                            .scoredGoals(p.getScored_goals())
+                            .playingTime(new PlayingTime(converted, unit))
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 }
