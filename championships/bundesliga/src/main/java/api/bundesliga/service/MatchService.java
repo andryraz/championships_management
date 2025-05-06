@@ -126,9 +126,9 @@ public class MatchService {
             playerCrudOperations.incrementPlayerGoals(player.getId());
         }
 
-//        return matchCrudOperations.getMatchByIdWithDetails(matchId)
-//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Match could not be fetched"));
-        return null;
+        return matchCrudOperations.getMatchByIdWithDetails(matchId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Match could not be fetched"));
+//        return null;
     }
 
 

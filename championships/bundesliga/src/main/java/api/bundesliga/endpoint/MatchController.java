@@ -1,5 +1,6 @@
 package api.bundesliga.endpoint;
 
+import api.bundesliga.endpoint.rest.GoalInput;
 import api.bundesliga.entity.Match;
 import api.bundesliga.entity.MatchStatus;
 import api.bundesliga.service.MatchService;
@@ -12,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,5 +41,14 @@ public class MatchController {
                 matchAfter,
                 matchBeforeOrEquals
         );
+    }
+
+    @PostMapping("/matches/{id}/goals")
+    public ResponseEntity<Match> addGoalsToMatch(
+            @PathVariable String id,
+            @RequestBody List<GoalInput> goals
+    ) {
+        Match match = matchService.addGoals(UUID.fromString(id), goals);
+        return ResponseEntity.ok(match);
     }
 }

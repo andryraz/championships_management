@@ -18,15 +18,12 @@ public class SynchronizationService {
     public void synchronizeData() {
 //        Integer seasonYear = request.getSeasonYear();
 
-        // 1. Appels aux API des championnats
         List<StatClub> clubStats = championshipClient.fetchClubStatistics();
         List<StatPlayer> playerStats = championshipClient.fetchPlayerStatistics();
 
-        // 2. Suppression des anciennes données
         statCrudOperations.deleteClubStats();
         statCrudOperations.deletePlayerStats();
 
-        // 3. Insertion des nouvelles données
         statCrudOperations.insertClubStats(clubStats);
         statCrudOperations.insertPlayerStats(playerStats);
     }

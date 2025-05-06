@@ -99,20 +99,20 @@ public class ClubCrudOperations {
         }
     }
 
-    public List<Club> findById(String id) throws RuntimeException {
-        List<Club> clubs = new ArrayList<>();
+
+
+    public Club findById(String id) throws RuntimeException {
+
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement("select c.id, c.name, c.year_creation, c.acronym, c.stadium, c.coach_name, c.coach_nationality from player p join club c on p.club_id=c.id where p.id = ?::uuid")) {
+             PreparedStatement statement = connection.prepareStatement("SELECT id, name, year_creation, stadium, acronym, coach_name, coach_nationality FROM club WHERE id = ?::uuid")) {
             statement.setString(1, id);
 
             try (ResultSet resultSet = statement.executeQuery()) {
-
-                while (resultSet.next()) {
-                    Club club = clubMapper.apply(resultSet);
-                    clubs.add(club);
+                if (resultSet.next()) {
+                    return clubMapper.apply(resultSet);
                 }
-                return clubs;
             }
+            throw new RuntimeException("Not found");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

@@ -67,7 +67,7 @@ public class MatchCrudOperations {
     }
 
     public void insertGoal(UUID matchId, String clubId, Scorer scorer) {
-        String query = "INSERT INTO goal (id, match_id, club_id, player_id, minute, own_goal) VALUES (?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO goal (id, match_id, club_id, scorer_id, minute_of_goal, own_goal) VALUES (?, ?::uuid, ?, ?, ?, ?)";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
@@ -187,7 +187,7 @@ public class MatchCrudOperations {
                             )
                             .build();
 
-                    // on peut ensuite charger les buteurs pour chaque match
+
                     m.setClubPlayingHome(loadScorers(conn, m.getId(), m.getClubPlayingHome()));
                     m.setClubPlayingAway(loadScorers(conn, m.getId(), m.getClubPlayingAway()));
 
@@ -233,5 +233,97 @@ public class MatchCrudOperations {
         club.setScorers(list);
         return club;
     }
+
+    public Optional<Match> getMatchByIdWithDetails(UUID matchId) {
+        String matchQuery = """
+        SELECT m.id as match_id, m.stadium, m.match_datetime, m.status, s.year as season_year,
+               home.id as home_id, home.name as home_name, home.acronym as home_acronym,
+               away.id as away_id, away.name as away_name, away.acronym as away_acronym
+        FROM match m
+        JOIN club home ON m.club_home_id = home.id
+        JOIN club away ON m.club_away_id = away.id
+        JOIN season s ON m.season_id = s.id
+        WHERE m.id = ?
+        """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement matchStmt = conn.prepareStatement(matchQuery)) {
+
+            matchStmt.setObject(1, matchId);
+            ResultSet rs = matchStmt.executeQuery();
+
+            if (!rs.next()) return Optional.empty();
+
+            MatchClub home = MatchClub.builder()
+                    .id(rs.getString("home_id"))
+                    .name(rs.getString("home_name"))
+                    .acronym(rs.getString("home_acronym"))
+                    .score(getClubScore(conn, matchId, rs.getString("home_id")))
+                    .scorers(getScorers(conn, matchId, rs.getString("home_id")))
+                    .build();
+
+            MatchClub away = MatchClub.builder()
+                    .id(rs.getString("away_id"))
+                    .name(rs.getString("away_name"))
+                    .acronym(rs.getString("away_acronym"))
+                    .score(getClubScore(conn, matchId, rs.getString("away_id")))
+                    .scorers(getScorers(conn, matchId, rs.getString("away_id")))
+                    .build();
+
+            return Optional.of(Match.builder()
+                    .id(rs.getString("match_id"))
+                    .stadium(rs.getString("stadium"))
+                    .matchDatetime(rs.getDate("match_datetime").toLocalDate())
+                    .actualStatus(MatchStatus.valueOf(rs.getString("status")))
+                    .seasonYear(rs.getInt("season_year"))
+                    .clubPlayingHome(home)
+                    .clubPlayingAway(away)
+                    .build());
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors de la récupération du match", e);
+        }
+    }
+
+    private Integer getClubScore(Connection conn, UUID matchId, String clubId) throws SQLException {
+        String query = "SELECT COUNT(*) FROM goal WHERE match_id = ? AND club_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setObject(1, matchId);
+            stmt.setObject(2, UUID.fromString(clubId));
+            ResultSet rs = stmt.executeQuery();
+            return rs.next() ? rs.getInt(1) : 0;
+        }
+    }
+
+    private List<Scorer> getScorers(Connection conn, UUID matchId, String clubId) throws SQLException {
+        String query = """
+        SELECT g.minute_of_goal, g.own_goal, p.id, p.name, p.number
+        FROM goal g
+        JOIN player p ON g.scorer_id = p.id
+        WHERE g.match_id = ? AND g.club_id = ?
+        """;
+
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setObject(1, matchId);
+            stmt.setObject(2, UUID.fromString(clubId));
+            ResultSet rs = stmt.executeQuery();
+
+            List<Scorer> scorers = new ArrayList<>();
+            while (rs.next()) {
+                PlayerMin player = new PlayerMin(
+                        rs.getString("id"),
+                        rs.getString("name"),
+                        rs.getInt("number")
+                );
+                Scorer scorer = new Scorer(player, rs.getInt("minute_of_goal"), rs.getBoolean("own_goal"));
+                scorers.add(scorer);
+            }
+            return scorers;
+        }
+    }
+
+
+
+
 
 }

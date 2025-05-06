@@ -82,6 +82,8 @@ public class PlayerCrudOperations {
         }
     }
 
+
+
     public StatPlayer findByIdPlayer(String player_id, Integer seasonYear) {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT ps.scored_goals, ps.playing_time_seconds FROM player_statistics ps JOIN player p on ps.player_id = p.id JOIN season s on s.id=ps.season_id where ps.player_id= ?::uuid and s.year= ?")) {
@@ -115,24 +117,54 @@ public class PlayerCrudOperations {
             }
             return Optional.empty();
         } catch (SQLException e) {
-            throw new RuntimeException("Erreur lors de la recherche du joueur", e);
+            throw new RuntimeException("Error searching for player", e);
         }
     }
 
     public void incrementPlayerGoals(String playerId) {
-        String query = "UPDATE player_statistics SET scored_goals = scored_goals + 1 WHERE player_id = ?";
+        String query = """
+                         INSERT INTO player_statistics (player_id, scored_goals)
+                        VALUES (?, 1)
+                        ON CONFLICT (player_id)
+                        DO UPDATE SET scored_goals = player_statistics.scored_goals + 1
+                       """;
+
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setObject(1, UUID.fromString(playerId));
-            int affected = stmt.executeUpdate();
-            if (affected == 0) {
-                throw new RuntimeException("Statistiques du joueur non trouvées");
-            }
+            stmt.executeUpdate();
+
         } catch (SQLException e) {
-            throw new RuntimeException("Erreur lors de la mise à jour des statistiques du joueur", e);
-        }
+            throw new RuntimeException("Error while incrementing player goals", e);
+        }}
+
+//    public boolean existsByClubIdAndNumber(String clubId, int number) {
+//        String sql = "SELECT COUNT(*) FROM player WHERE club_id = ?::uuid AND number = ?";
+//        try (Connection conn = dataSource.getConnection();
+//             PreparedStatement stmt = conn.prepareStatement(sql)) {
+//            stmt.setObject(1, clubId);
+//            stmt.setInt(2, number);
+//            ResultSet rs = stmt.executeQuery();
+//            return rs.next() && rs.getInt(1) > 0;
+//        } catch (SQLException e) {
+//            throw new RuntimeException("Error checking player number in club", e);
+//        }
+//    }
+
+    public boolean existsByClubIdAndNumber(String clubId, int number) {
+        try (Connection conn = dataSource.getConnection();
+        PreparedStatement stmt = conn.prepareStatement("SELECT 1 FROM player WHERE club_id = ?::uuid AND number = ?")){
+        stmt.setString(1, clubId);
+        stmt.setInt(2, number);
+        ResultSet rs = stmt.executeQuery();
+        return rs.next();
+         } catch (SQLException e) {
+           throw new RuntimeException("Error checking player number in club", e);
+        }// retourne true s'il y a un résultat
     }
+
+
 
     public List<StatPlayerRest> getStat() {
         List<StatPlayerRest> statPlayerRest = new ArrayList<>();

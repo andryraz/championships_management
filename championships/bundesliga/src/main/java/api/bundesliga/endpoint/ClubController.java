@@ -8,7 +8,9 @@ import api.bundesliga.entity.Player;
 
 import api.bundesliga.entity.StatClub;
 import api.bundesliga.service.ClubService;
+import api.bundesliga.service.PlayerService;
 import api.bundesliga.service.exception.ClientException;
+import api.bundesliga.service.exception.EntityNotFoundException;
 import api.bundesliga.service.exception.NotFoundException;
 import api.bundesliga.service.exception.ServerException;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -23,6 +27,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @RequiredArgsConstructor
 public class ClubController {
     private final ClubService clubService;
+    private final PlayerService playerService;
 
     @GetMapping("/clubs")
     public ResponseEntity<List<Club>> getClubs(
@@ -73,18 +78,36 @@ public class ClubController {
     }
 
 
-//    @PostMapping("/player")
-//    public ResponseEntity<Object> saveDish(@RequestBody List<Player> players) {
+//    @PostMapping("/clubs/{id}/players")
+//    public ResponseEntity<?> savePlayerOnClub(
+//            @PathVariable("id") String clubId,
+//            @RequestBody List<PlayerRest> players) {
 //        try {
-//            return ResponseEntity.ok().body(playerService.saveAll(players));
-//        } catch (ClientException e) {
-//            return ResponseEntity.badRequest().body(e.getMessage());
-//        } catch (NotFoundException e) {
-//            return ResponseEntity.status(NOT_FOUND).body(e.getMessage());
-//        } catch (ServerException e) {
-//            return ResponseEntity.internalServerError().body(e.getMessage());
+//            List<Player> savedPlayers = playerService.savePlayerOnClub(clubId, players);
+//            return ResponseEntity.ok(savedPlayers);
+//        } catch (IllegalArgumentException | EntityNotFoundException e) {
+//            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+//        } catch (Exception e) {
+//            return ResponseEntity.internalServerError().body(Map.of("error", "Unexpected error"));
 //        }
 //    }
+
+    @PostMapping("/clubs/{id}/players")
+    public ResponseEntity<?> savePlayerOnClub(
+            @PathVariable("id") String clubId,
+            @RequestBody List<PlayerRest> players) {
+        try {
+            List<Player> savedPlayers = playerService.savePlayerOnClub(clubId, players);
+            return ResponseEntity.ok(savedPlayers);
+        } catch (IllegalArgumentException | EntityNotFoundException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            e.printStackTrace(); // Affiche la stack trace complète dans la console
+            return ResponseEntity.internalServerError().body(Map.of("error", "Unexpected error"));
+        }
+    }
+
+
 
 
 
