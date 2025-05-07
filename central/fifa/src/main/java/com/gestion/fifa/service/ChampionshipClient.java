@@ -30,7 +30,10 @@ public class ChampionshipClient {
     private int ligue1Port;
 
     @Value("${championship.premier-league.port}")
-    private int PremierLeaguePortPort;
+    private int premierLeaguePort;
+
+    @Value("${championship.la-liga.port}")
+    private int laligaPort;
 
     public List<StatClub> fetchClubStatistics(String championship) {
         int port = resolvePort(championship);
@@ -51,6 +54,8 @@ public class ChampionshipClient {
             case "bundesliga" -> bundesligaPort;
             case "premier-league" -> premierLeaguePort;
             case "ligue-1" -> ligue1Port;
+            case "seria-A" -> seriaAPort;
+            case "la-liga" -> laligaPort;
             default -> throw new IllegalArgumentException("Unknown championship: " + championship);
         };
     }
