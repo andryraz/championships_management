@@ -35,7 +35,7 @@ public class PlayerController {
     }
 
 
-    @PutMapping("/player")
+    @PutMapping("/players")
     public ResponseEntity<Object> savePlayers(@RequestBody List<Player> players) {
         try {
             return ResponseEntity.ok().body(playerService.saveAll(players));

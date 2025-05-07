@@ -17,8 +17,6 @@ public class StatClub {
     private int year_creation;
     private String stadium;
     private Coach coach;
-//    private String coach_name;
-//    private String coach_nationality;
     private int ranking_points;
     private int scored_goals;
     private int conceded_goals;

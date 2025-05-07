@@ -189,7 +189,6 @@ public class MatchCrudOperations {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
-            // bind parameters
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
             }

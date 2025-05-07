@@ -38,7 +38,6 @@ public class StatClubMapper implements Function<ResultSet, StatClub> {
         statClub.setDifference_goals(resultSet.getInt("difference_goals"));
         statClub.setCleanSheetNumber(resultSet.getInt("clean_sheet_number"));
 
-
         return statClub;
     }
 }

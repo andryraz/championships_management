@@ -12,7 +12,6 @@ import java.util.List;
 @Builder
 @Data
 public class StatPlayer {
-
     private int scored_goals;
     private List<PlayingTime> playingTime;
 

@@ -18,7 +18,5 @@ public class Club {
     private Integer year_creation;
     private String stadium;
     private Coach coach;
-//    private String coach_name;
-//    private String coach_nationality;
 
 }

@@ -179,34 +179,6 @@ public class ClubCrudOperations {
         }
     }
 
-//    public void saveOrUpdatePlayer(Player p) {
-//        String sql = "INSERT INTO player (id, name, number, age, nationality, position, club_id) " +
-//                "VALUES (?::uuid, ?, ?, ?, ?, ?::player_position, ?::uuid) " +
-//                "ON CONFLICT (id) DO UPDATE SET " +
-//                "name = EXCLUDED.name, number = EXCLUDED.number, age = EXCLUDED.age, " +
-//                "nationality = EXCLUDED.nationality, position = EXCLUDED.position, club_id = EXCLUDED.club_id";
-//
-//        try (Connection conn = dataSource.getConnection();
-//             PreparedStatement stmt = conn.prepareStatement(sql)) {
-//
-//            if (p.getId() == null) {
-//                p.setId(UUID.randomUUID().toString());
-//            }
-//
-//            stmt.setString(1, p.getId());
-//            stmt.setString(2, p.getName());
-//            stmt.setInt(3, p.getNumber());
-//            stmt.setInt(4, p.getAge());
-//            stmt.setString(5, p.getNationality());
-//            stmt.setString(6, p.getPlayerPosition().name());
-//            stmt.setString(7, p.getClub().getId());
-//            stmt.executeUpdate();
-//
-//        } catch (SQLException e) {
-//            throw new RuntimeException("Failed to save or update player", e);
-//        }
-//    }
-
     public void saveOrUpdatePlayer(Player player) {
         String sql = "INSERT INTO player (id, name, number, age, nationality, position, club_id) " +
                 "VALUES (?::uuid, ?, ?, ?, ?, ?::player_position, ?::uuid) " +
