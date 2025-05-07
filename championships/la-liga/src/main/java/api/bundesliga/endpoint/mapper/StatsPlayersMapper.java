@@ -28,7 +28,7 @@ public class StatsPlayersMapper implements Function<ResultSet, StatPlayerRest> {
         player.setAge(resultSet.getInt("age"));
         player.setScored_goals(resultSet.getInt("scored_goals"));
         player.setPlaying_time_seconds(resultSet.getInt("playing_time_seconds"));
-        player.setChampionshipName("bundesliga");
+        player.setChampionshipName("la-liga");
 
         return player;
     }

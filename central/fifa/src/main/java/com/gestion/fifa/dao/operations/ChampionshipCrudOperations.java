@@ -20,30 +20,24 @@ public class ChampionshipCrudOperations {
         private final DataSource dataSource;
         private final ChampionshipMapper mapper;
 
-        public List<ChampionshipRanking> findAllOrderedByMedianAsc() {
-            String sql = """
-            SELECT name AS championship, goal_difference_median AS differenceGoalsMedian
-            FROM championship_stats
-            ORDER BY goal_difference_median ASC
-        """;
+    public List<ChampionshipRanking> findAllRankings() {
+        List<ChampionshipRanking> rankings = new ArrayList<>();
+        String sql = "SELECT name, goal_difference_median FROM championship_stats";
 
-            List<ChampionshipRanking> rankings = new ArrayList<>();
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
 
-            try (Connection conn = dataSource.getConnection();
-                 PreparedStatement ps = conn.prepareStatement(sql);
-                 ResultSet rs = ps.executeQuery()) {
-
-                int rank = 1;
-                while (rs.next()) {
-                    rankings.add(mapper.map(rs, rank++));
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
+            while (rs.next()) {
+                rankings.add(mapper.apply(rs));
             }
 
-            return rankings;
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to load championship rankings", e);
         }
+
+        return rankings;
+    }
     }
 
 

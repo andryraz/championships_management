@@ -1,6 +1,7 @@
 package com.gestion.fifa.entity;
 
 
+import com.gestion.fifa.dto.Coach;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,8 +18,7 @@ public class StatClub {
     private String acronym;
     private int year_creation;
     private String stadium;
-    private String coach_name;
-    private String coach_nationality;
+    private Coach coach;
     private int ranking_points;
     private int scored_goals;
     private int conceded_goals;

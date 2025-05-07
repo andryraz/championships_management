@@ -38,11 +38,20 @@ public class ClubController {
         return ResponseEntity.ok(clubs);
     }
 
+//    @GetMapping("/clubs/{id}/players")
+//    public ResponseEntity<List<Player>> getPlayerById(
+//           @PathVariable("id") String id
+//   ) {
+//       return ResponseEntity.ok(clubService.getPlayerByIdClub(id));
+//    }
+
     @GetMapping("/clubs/{id}/players")
-    public ResponseEntity<List<Player>> getPlayerById(
-           @PathVariable("id") String id
-   ) {
-       return ResponseEntity.ok(clubService.getPlayerByIdClub(id));
+    public ResponseEntity<List<PlayerRest>> getPlayerById(@PathVariable("id") String id) {
+        List<Player> players = clubService.getPlayerByIdClub(id);
+        List<PlayerRest> result = players.stream()
+                .map(this::toRest)
+                .toList();
+        return ResponseEntity.ok(result);
     }
 
     @PutMapping("/clubs")
@@ -94,6 +103,16 @@ public class ClubController {
     }
 
 
+    private PlayerRest toRest(Player p) {
+        return PlayerRest.builder()
+                .id(p.getId())
+                .name(p.getName())
+                .number(p.getNumber())
+                .nationality(p.getNationality())
+                .age(p.getAge())
+                .playerPosition(p.getPlayerPosition())
+                .build();
+    }
 
 
 

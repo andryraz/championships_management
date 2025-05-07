@@ -1,35 +1,37 @@
-package api.bundesliga.endpoint.mapper;
+package api.bundesliga.dao.mapper;
 
-
-import api.bundesliga.endpoint.rest.StatPlayerRest;
+import api.bundesliga.dao.operations.ClubCrudOperations;
+import api.bundesliga.entity.Club;
+import api.bundesliga.entity.Player;
 import api.bundesliga.entity.PlayerPosition;
-import api.bundesliga.entity.StatPlayer;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
+import java.util.List;
 import java.util.function.Function;
 
 @Component
 @RequiredArgsConstructor
-public class StatsPlayersMapper implements Function<ResultSet, StatPlayerRest> {
+public class GetPlayerMapper implements Function<ResultSet, Player> {
+    private final ClubCrudOperations clubCrudOperations;
 
     @SneakyThrows
     @Override
-    public StatPlayerRest apply(ResultSet resultSet) {
+    public Player apply(ResultSet resultSet) {
+        String id = resultSet.getString("id");
 
-        StatPlayerRest player = new StatPlayerRest();
+        Player player = new Player();
         player.setId(resultSet.getString("id"));
         player.setName(resultSet.getString("name"));
         player.setPlayerPosition(PlayerPosition.valueOf(resultSet.getString("position")));
         player.setNationality(resultSet.getString("nationality"));
         player.setNumber(resultSet.getInt("number"));
         player.setAge(resultSet.getInt("age"));
-        player.setScored_goals(resultSet.getInt("scored_goals"));
-        player.setPlaying_time_seconds(resultSet.getInt("playing_time_seconds"));
-        player.setChampionshipName("seria-A");
-
+        String clubId = resultSet.getString("club_id");
+        Club club = clubCrudOperations.findById(clubId);
+        player.setClub(club);
         return player;
     }
 }

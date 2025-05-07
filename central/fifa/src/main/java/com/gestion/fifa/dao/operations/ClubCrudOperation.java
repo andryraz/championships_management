@@ -26,7 +26,7 @@ public class ClubCrudOperation {
 
         String query = """
             SELECT * FROM club_stats
-            ORDER BY goal_difference DESC, goals_scored DESC
+            ORDER BY ranking_points DESC, goal_difference DESC, clean_sheet_count DESC
             LIMIT ?
         """;
 
@@ -42,18 +42,18 @@ public class ClubCrudOperation {
                         .id(rs.getString("id"))
                         .name(rs.getString("name"))
                         .acronym(rs.getString("acronym"))
-                        .yearCreation(0) // Valeur par défaut
-                        .stadium("")     // Valeur par défaut
+                        .yearCreation(rs.getInt("year_creation"))
+                        .stadium(rs.getString("stadium"))
                         .coach(Coach.builder()
                                 .name(rs.getString("coach_name"))
-                                .nationality(rs.getString("nationality"))
+                                .nationality(rs.getString("coach_nationality"))
                                 .build())
                         .build();
 
                 ClubRanking clubRanking = ClubRanking.builder()
                         .rank(rank++)
                         .club(club)
-                        .rankingPoints(0) // Par défaut (non disponible)
+                        .rankingPoints(rs.getInt("ranking_points"))
                         .scoredGoals(rs.getInt("goals_scored"))
                         .concededGoals(rs.getInt("goals_conceded"))
                         .differenceGoals(rs.getInt("goal_difference"))

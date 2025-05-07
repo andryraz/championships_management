@@ -14,7 +14,7 @@ public class Club {
     private String id;
     private String name;
     private String acronym;
-    private int yearCreation; // à adapter si non disponible
-    private String stadium; // idem
+    private Integer yearCreation;
+    private String stadium;
     private Coach coach;
 }

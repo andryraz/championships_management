@@ -9,13 +9,19 @@ import java.sql.SQLException;
 import java.util.function.Function;
 
 @Component
-public class ChampionshipMapper {
+public class ChampionshipMapper implements Function<ResultSet, ChampionshipRanking> {
 
-    public ChampionshipRanking map(ResultSet rs, int rank) throws SQLException {
-        ChampionshipRanking cr = new ChampionshipRanking();
-        cr.setRank(rank);
-        cr.setChampionship(rs.getString("championship"));
-        cr.setDifferenceGoalsMedian(rs.getDouble("differenceGoalsMedian"));
-        return cr;
+    @Override
+    public ChampionshipRanking apply(ResultSet rs) {
+        try {
+            return new ChampionshipRanking(
+                    0,
+                    rs.getString("name"),
+                    rs.getDouble("goal_difference_median")
+            );
+        } catch (SQLException e) {
+            throw new RuntimeException("Error mapping ResultSet to ChampionshipRanking", e);
+        }
     }
 }
+

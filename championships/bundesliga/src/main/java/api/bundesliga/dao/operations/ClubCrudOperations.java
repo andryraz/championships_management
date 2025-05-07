@@ -103,7 +103,6 @@ public class ClubCrudOperations {
     }
 
 
-
     public Club findById(String id) throws RuntimeException {
 
         try (Connection connection = dataSource.getConnection();
@@ -114,12 +113,14 @@ public class ClubCrudOperations {
                 if (resultSet.next()) {
                     return clubMapper.apply(resultSet);
                 }
+
             }
             throw new RuntimeException("Not found");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
+
 
     public List<Player> findPlayerByIdClub(String id) throws RuntimeException {
         List<Player> players = new ArrayList<>();
@@ -178,7 +179,35 @@ public class ClubCrudOperations {
         }
     }
 
-    public void saveOrUpdatePlayer(Player p) {
+//    public void saveOrUpdatePlayer(Player p) {
+//        String sql = "INSERT INTO player (id, name, number, age, nationality, position, club_id) " +
+//                "VALUES (?::uuid, ?, ?, ?, ?, ?::player_position, ?::uuid) " +
+//                "ON CONFLICT (id) DO UPDATE SET " +
+//                "name = EXCLUDED.name, number = EXCLUDED.number, age = EXCLUDED.age, " +
+//                "nationality = EXCLUDED.nationality, position = EXCLUDED.position, club_id = EXCLUDED.club_id";
+//
+//        try (Connection conn = dataSource.getConnection();
+//             PreparedStatement stmt = conn.prepareStatement(sql)) {
+//
+//            if (p.getId() == null) {
+//                p.setId(UUID.randomUUID().toString());
+//            }
+//
+//            stmt.setString(1, p.getId());
+//            stmt.setString(2, p.getName());
+//            stmt.setInt(3, p.getNumber());
+//            stmt.setInt(4, p.getAge());
+//            stmt.setString(5, p.getNationality());
+//            stmt.setString(6, p.getPlayerPosition().name());
+//            stmt.setString(7, p.getClub().getId());
+//            stmt.executeUpdate();
+//
+//        } catch (SQLException e) {
+//            throw new RuntimeException("Failed to save or update player", e);
+//        }
+//    }
+
+    public void saveOrUpdatePlayer(Player player) {
         String sql = "INSERT INTO player (id, name, number, age, nationality, position, club_id) " +
                 "VALUES (?::uuid, ?, ?, ?, ?, ?::player_position, ?::uuid) " +
                 "ON CONFLICT (id) DO UPDATE SET " +
@@ -188,23 +217,29 @@ public class ClubCrudOperations {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            if (p.getId() == null) {
-                p.setId(UUID.randomUUID().toString());
+            if (player.getId() == null) {
+                player.setId(UUID.randomUUID().toString());
             }
 
-            stmt.setString(1, p.getId());
-            stmt.setString(2, p.getName());
-            stmt.setInt(3, p.getNumber());
-            stmt.setInt(4, p.getAge());
-            stmt.setString(5, p.getNationality());
-            stmt.setString(6, p.getPlayerPosition().name());
-            stmt.setString(7, p.getClub().getId());
+            String position = player.getPlayerPosition() != null
+                    ? player.getPlayerPosition().name()
+                    : "STRIKER";
+
+            stmt.setString(1, player.getId());
+            stmt.setString(2, player.getName());
+            stmt.setInt(3, player.getNumber());
+            stmt.setInt(4, player.getAge());
+            stmt.setString(5, player.getNationality());
+            stmt.setString(6, position); //
+            stmt.setString(7, player.getClub().getId());
+
             stmt.executeUpdate();
 
         } catch (SQLException e) {
             throw new RuntimeException("Failed to save or update player", e);
         }
     }
+
 
     public List<StatClubRest> getStat() {
         List<StatClubRest> statclubs = new ArrayList<>();
@@ -217,7 +252,7 @@ public class ClubCrudOperations {
         FROM club_statistics cs
         JOIN club c ON c.id = cs.club_id
         JOIN season s ON s.id = cs.season_id
-        WHERE s.year = (SELECT MAX(year) FROM season)
+        WHERE s.year = (SELECT MIN(year) FROM season)
     """;
 
         try (Connection connection = dataSource.getConnection();

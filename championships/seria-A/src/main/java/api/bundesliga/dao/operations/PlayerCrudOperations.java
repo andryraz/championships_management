@@ -2,6 +2,7 @@ package api.bundesliga.dao.operations;
 
 
 import api.bundesliga.dao.DataSource;
+import api.bundesliga.dao.mapper.GetPlayerMapper;
 import api.bundesliga.endpoint.mapper.StatsPlayersMapper;
 import api.bundesliga.endpoint.rest.StatPlayerRest;
 import api.bundesliga.entity.Player;
@@ -29,6 +30,7 @@ import java.util.UUID;
 public class PlayerCrudOperations {
     private  final DataSource dataSource;
     private final PlayerMapper playerMapper;
+    private final GetPlayerMapper getPlayerMapper;
     private final StatPlayerMapper statplayerMapper;
     private final StatsPlayersMapper statsplayersMapper;
 
@@ -73,7 +75,7 @@ public class PlayerCrudOperations {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    players.add(playerMapper.apply(resultSet));
+                    players.add(getPlayerMapper.apply(resultSet));
                 }
             }
 
@@ -94,6 +96,7 @@ public class PlayerCrudOperations {
                                  + " returning id, name, number, position, age, nationality")) {
                 entities.forEach(entityToSave -> {
                     try {
+
                         statement.setString(1, entityToSave.getId());
                         statement.setString(2, entityToSave.getName());
                         statement.setInt(3, entityToSave.getNumber());
@@ -157,7 +160,7 @@ public class PlayerCrudOperations {
         String query = """
                          INSERT INTO player_statistics (player_id, scored_goals)
                         VALUES (?, 1)
-                        ON CONFLICT (player_id)
+                        ON CONFLICT (season_id, player_id)
                         DO UPDATE SET scored_goals = player_statistics.scored_goals + 1
                        """;
 
@@ -209,7 +212,7 @@ public class PlayerCrudOperations {
         FROM player_statistics ps
         JOIN player p ON ps.player_id = p.id
         JOIN season s ON s.id = ps.season_id
-        WHERE s.year = (SELECT MAX(year) FROM season)
+        WHERE s.year = (SELECT MIN(year) FROM season)
     """;
 
         try (Connection connection = dataSource.getConnection();

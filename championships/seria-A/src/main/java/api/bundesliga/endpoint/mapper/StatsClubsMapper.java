@@ -36,7 +36,7 @@ public class StatsClubsMapper implements Function<ResultSet, StatClubRest> {
         statClub.setConceded_goals(resultSet.getInt("conceded_goals"));
         statClub.setDifference_goals(resultSet.getInt("difference_goals"));
         statClub.setCleanSheetNumber(resultSet.getInt("clean_sheet_number"));
-        statClub.setChampionshipName("bundesliga");
+        statClub.setChampionshipName("seria-A");
 
         return statClub;
     }

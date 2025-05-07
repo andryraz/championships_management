@@ -20,7 +20,7 @@ public class PlayerCrudOperations {
 
     public List<StatPlayer> findAll() {
         String sql = "SELECT id, name, number, nationality, age, position, scored_goals, total_playing_time_seconds, championship_name "
-                + "FROM player_stats";
+                + "FROM player_stats ORDER BY scored_goals DESC";
         List<StatPlayer> list = new ArrayList<>();
         try (Connection c = ds.getConnection();
              Statement st = c.createStatement();

@@ -30,7 +30,7 @@ public class PlayerMapper implements Function<ResultSet, Player> {
         player.setNationality(resultSet.getString("nationality"));
         player.setNumber(resultSet.getInt("number"));
         player.setAge(resultSet.getInt("age"));
-        //List<Club> club = clubCrudOperations.findById(id);
+       // Club club = clubCrudOperations.findById(id);
         //player.setClub(club);
         return player;
     }

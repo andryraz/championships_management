@@ -165,7 +165,7 @@ public class MatchCrudOperations {
         params.add(seasonYear);
 
         if (status != null) {
-            sql.append(" AND m.status = ?");
+            sql.append(" AND m.status = ?::match_status");
             params.add(status.name());
         }
         if (clubName != null && !clubName.isBlank()) {
