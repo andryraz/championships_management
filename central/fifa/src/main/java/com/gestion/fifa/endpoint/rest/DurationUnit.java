@@ -1,4 +1,4 @@
-package com.gestion.fifa.dto;
+package com.gestion.fifa.rest;
 
 
 public enum DurationUnit {

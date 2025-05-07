@@ -1,11 +1,10 @@
 // ClubRanking.java
-package com.gestion.fifa.dto;
+package com.gestion.fifa.rest;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.gestion.fifa.dto.Club;
 
 @Data
 @Builder

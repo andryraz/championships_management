@@ -1,5 +1,5 @@
 // Club.java
-package com.gestion.fifa.dto;
+package com.gestion.fifa.rest;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
