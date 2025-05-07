@@ -1,8 +1,7 @@
 package com.gestion.fifa.dao.mapper;
 
-import com.gestion.fifa.dto.PlayerPosition;
+import com.gestion.fifa.endpoint.rest.PlayerPosition;
 import com.gestion.fifa.entity.StatPlayer;
-import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;

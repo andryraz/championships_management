@@ -1,7 +1,7 @@
 package com.gestion.fifa.endpoint;
 
-import com.gestion.fifa.dto.DurationUnit;
-import com.gestion.fifa.dto.PlayerRanking;
+import com.gestion.fifa.endpoint.rest.DurationUnit;
+import com.gestion.fifa.endpoint.rest.PlayerRanking;
 import com.gestion.fifa.service.PlayerService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;

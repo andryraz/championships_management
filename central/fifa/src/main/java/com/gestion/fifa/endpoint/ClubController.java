@@ -1,7 +1,7 @@
 // ClubController.java
 package com.gestion.fifa.endpoint;
 
-import com.gestion.fifa.dto.ClubRanking;
+import com.gestion.fifa.endpoint.rest.ClubRanking;
 import com.gestion.fifa.service.ClubStatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

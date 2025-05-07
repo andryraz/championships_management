@@ -1,8 +1,8 @@
 package com.gestion.fifa.dao.mapper;
 
-import com.gestion.fifa.dto.Club;
-import com.gestion.fifa.dto.ClubRanking;
-import com.gestion.fifa.dto.Coach;
+import com.gestion.fifa.endpoint.rest.Club;
+import com.gestion.fifa.endpoint.rest.ClubRanking;
+import com.gestion.fifa.endpoint.rest.Coach;
 import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;

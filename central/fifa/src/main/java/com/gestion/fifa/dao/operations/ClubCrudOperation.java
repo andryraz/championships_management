@@ -2,7 +2,7 @@ package com.gestion.fifa.dao.operations;
 
 import com.gestion.fifa.dao.DataSource;
 import com.gestion.fifa.dao.mapper.ClubMapper;
-import com.gestion.fifa.dto.ClubRanking;
+import com.gestion.fifa.endpoint.rest.ClubRanking;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

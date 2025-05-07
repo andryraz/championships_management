@@ -2,7 +2,7 @@
 package com.gestion.fifa.service;
 
 import com.gestion.fifa.dao.operations.ClubCrudOperation;
-import com.gestion.fifa.dto.ClubRanking;
+import com.gestion.fifa.endpoint.rest.ClubRanking;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
