@@ -5,6 +5,8 @@ import api.bundesliga.dao.mapper.ClubMapper;
 import api.bundesliga.dao.mapper.PlayerMapper;
 import api.bundesliga.dao.mapper.StatClubMapper;
 import api.bundesliga.endpoint.mapper.PlayerRestMapper;
+import api.bundesliga.endpoint.mapper.StatsClubsMapper;
+import api.bundesliga.endpoint.rest.StatClubRest;
 import api.bundesliga.entity.Club;
 import api.bundesliga.entity.Player;
 import api.bundesliga.entity.StatClub;
@@ -27,6 +29,7 @@ public class ClubCrudOperations {
     private  final DataSource dataSource;
     private final ClubMapper clubMapper;
     private final StatClubMapper statClubMapper;
+    private final StatsClubsMapper statsClubsMapper;
     private final PlayerMapper playerMapper;
     private final PlayerRestMapper playerRestMapper;
 
@@ -64,8 +67,8 @@ public class ClubCrudOperations {
                         statement.setString(3, entityToSave.getAcronym());
                         statement.setInt(4, entityToSave.getYear_creation());
                         statement.setString(5, entityToSave.getStadium());
-                        statement.setString(6, entityToSave.getCoach_name());
-                        statement.setString(7, entityToSave.getCoach_nationality());
+                        statement.setString(6, entityToSave.getCoach().getName());
+                        statement.setString(7, entityToSave.getCoach().getNationality());
 
                         statement.addBatch();
                     } catch (SQLException e) {
@@ -203,22 +206,33 @@ public class ClubCrudOperations {
         }
     }
 
-    public List<StatClub> getStat () {
-        List<StatClub> statclubs = new ArrayList<>();
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(
-                     "SELECT c.id, c.name, c.acronym, c.stadium, c.year_creation, c.coach_name, c.coach_nationality, cs.ranking_points, cs.scored_goals, cs.conceded_goals, cs.difference_goals, cs.clean_sheet_number FROM club_statistics cs JOIN club c ON c.id = cs.club_id JOIN season s ON s.id = cs.season_id")) {
+    public List<StatClubRest> getStat() {
+        List<StatClubRest> statclubs = new ArrayList<>();
 
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    statclubs.add(statClubMapper.apply(resultSet));
-                }
+        String sql = """
+        SELECT c.id, c.name, c.acronym, c.stadium, c.year_creation,
+               c.coach_name, c.coach_nationality,
+               cs.ranking_points, cs.scored_goals, cs.conceded_goals,
+               cs.difference_goals, cs.clean_sheet_number
+        FROM club_statistics cs
+        JOIN club c ON c.id = cs.club_id
+        JOIN season s ON s.id = cs.season_id
+        WHERE s.year = (SELECT MAX(year) FROM season)
+    """;
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                statclubs.add(statsClubsMapper.apply(resultSet));
             }
+
             return statclubs;
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
-
 
 }

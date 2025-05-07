@@ -19,9 +19,8 @@ public class PlayerService {
 
 
     public List<PlayerRanking> getBestPlayers(int top, DurationUnit unit) {
-        // 1. Récupère tous
+
         List<StatPlayer> all = repo.findAll();
-        // 2. Trie par scored_goals DESC, puis playing_time DESC
         List<StatPlayer> sorted = all.stream()
                 .sorted(Comparator
                         .comparingInt(StatPlayer::getScored_goals).reversed()
@@ -29,7 +28,7 @@ public class PlayerService {
                 )
                 .limit(top)
                 .collect(Collectors.toList());
-        // 3. Map vers DTO avec rank et conversion d’unités
+
         return sorted.stream()
                 .map(p -> {
                     long raw = p.getPlaying_time_seconds();

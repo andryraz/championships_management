@@ -5,6 +5,7 @@ import api.bundesliga.dao.operations.ClubCrudOperations;
 import api.bundesliga.dao.operations.PlayerCrudOperations;
 import api.bundesliga.endpoint.mapper.PlayerRestMapper;
 import api.bundesliga.endpoint.rest.PlayerRest;
+import api.bundesliga.endpoint.rest.StatClubRest;
 import api.bundesliga.entity.Club;
 import api.bundesliga.entity.Player;
 
@@ -67,7 +68,7 @@ public class ClubService {
 //        return clubCrudOperations.findPlayerByIdClub(clubId);
     }
 
-    public List<StatClub> getStat() {
+    public List<StatClubRest> getStat() {
         return clubCrudOperations.getStat();
     }
 

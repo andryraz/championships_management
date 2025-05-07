@@ -48,6 +48,37 @@ public class MatchCrudOperations {
         return matches;
     }
 
+    public MatchEntity findById(UUID id) throws SQLException {
+        String sql = "SELECT * FROM match WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setObject(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return new MatchEntity(
+                        UUID.fromString(rs.getString("id")),
+                        UUID.fromString(rs.getString("club_home_id")),
+                        UUID.fromString(rs.getString("club_away_id")),
+                        rs.getString("stadium"),
+                        rs.getTimestamp("match_datetime").toLocalDateTime(),
+                        MatchStatus.valueOf(rs.getString("status")),
+                        UUID.fromString(rs.getString("season_id"))
+                );
+            }
+            return null;
+        }
+    }
+
+    public void updateStatus(UUID id, MatchStatus newStatus) throws SQLException {
+        String sql = "UPDATE match SET status = ?::match_status WHERE id = ?::uuid";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newStatus.name());
+            ps.setObject(2, id);
+            ps.executeUpdate();
+        }
+    }
+
     public boolean existsBySeasonId(String seasonId) {
         String query = "SELECT COUNT(*) FROM match WHERE season_id = ?::uuid";
         try (Connection connection = dataSource.getConnection();

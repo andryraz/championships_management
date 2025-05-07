@@ -1,6 +1,7 @@
 package api.bundesliga.endpoint;
 
 import api.bundesliga.endpoint.rest.PlayerRest;
+import api.bundesliga.endpoint.rest.StatClubRest;
 import api.bundesliga.entity.Club;
 
 import api.bundesliga.entity.Player;
@@ -72,25 +73,10 @@ public class ClubController {
     }
 
     @GetMapping("/clubs/statistics")
-    public ResponseEntity<List<StatClub>> getStatClub() {
-        List<StatClub> statclubs = clubService.getStat();
+    public ResponseEntity<List<StatClubRest>> getStatClub() {
+        List<StatClubRest> statclubs = clubService.getStat();
         return ResponseEntity.ok(statclubs);
     }
-
-
-//    @PostMapping("/clubs/{id}/players")
-//    public ResponseEntity<?> savePlayerOnClub(
-//            @PathVariable("id") String clubId,
-//            @RequestBody List<PlayerRest> players) {
-//        try {
-//            List<Player> savedPlayers = playerService.savePlayerOnClub(clubId, players);
-//            return ResponseEntity.ok(savedPlayers);
-//        } catch (IllegalArgumentException | EntityNotFoundException e) {
-//            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-//        } catch (Exception e) {
-//            return ResponseEntity.internalServerError().body(Map.of("error", "Unexpected error"));
-//        }
-//    }
 
     @PostMapping("/clubs/{id}/players")
     public ResponseEntity<?> savePlayerOnClub(

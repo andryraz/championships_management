@@ -23,8 +23,8 @@ public class PlayerService {
     private final PlayerCrudOperations playerCrudOperations;
     private final ClubCrudOperations clubCrudOperations;
 
-    public List<Player> getAll(Integer page, Integer size) {
-        return playerCrudOperations.getAll(page, size);
+    public List<Player> getAll(int page, int size, Integer ageMin, Integer ageMax, String clubName, String playerName) {
+        return playerCrudOperations.getAll(page, size, ageMin, ageMax, clubName, playerName);
     }
 
     public List<Player> saveAll(List<Player> players) {

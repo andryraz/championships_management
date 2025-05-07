@@ -32,24 +32,57 @@ public class PlayerCrudOperations {
     private final StatPlayerMapper statplayerMapper;
     private final StatsPlayersMapper statsplayersMapper;
 
-    public List<Player> getAll(int page, int size) {
+    public List<Player> getAll(int page, int size, Integer ageMin, Integer ageMax, String clubName, String playerName) {
         List<Player> players = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("""
+        SELECT p.id, p.name, p.number, p.position, p.nationality, p.age, p.club_id 
+        FROM player p 
+        LEFT JOIN club c ON p.club_id = c.id 
+        WHERE 1=1
+    """);
+
+        List<Object> params = new ArrayList<>();
+
+        if (ageMin != null) {
+            sql.append(" AND p.age >= ?");
+            params.add(ageMin);
+        }
+        if (ageMax != null) {
+            sql.append(" AND p.age <= ?");
+            params.add(ageMax);
+        }
+        if (clubName != null && !clubName.isEmpty()) {
+            sql.append(" AND LOWER(c.name) LIKE LOWER(?)");
+            params.add("%" + clubName + "%");
+        }
+        if (playerName != null && !playerName.isEmpty()) {
+            sql.append(" AND LOWER(p.name) LIKE LOWER(?)");
+            params.add("%" + playerName + "%");
+        }
+
+        sql.append(" ORDER BY p.id ASC LIMIT ? OFFSET ?");
+        params.add(size);
+        params.add((page - 1) * size);
+
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(
-                     "SELECT id, name, number, position, nationality, position, age FROM player ORDER BY id ASC LIMIT ? OFFSET ?")) {
-            statement.setInt(1, size);
-            statement.setInt(2, (page - 1) * size);
+             PreparedStatement statement = connection.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+                statement.setObject(i + 1, params.get(i));
+            }
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     players.add(playerMapper.apply(resultSet));
                 }
             }
+
             return players;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
+
 
     @SneakyThrows
     public List<Player> saveAll(List<Player> entities) {
@@ -81,7 +114,6 @@ public class PlayerCrudOperations {
             }
         }
     }
-
 
 
     public StatPlayer findByIdPlayer(String player_id, Integer seasonYear) {
@@ -139,18 +171,23 @@ public class PlayerCrudOperations {
             throw new RuntimeException("Error while incrementing player goals", e);
         }}
 
-//    public boolean existsByClubIdAndNumber(String clubId, int number) {
-//        String sql = "SELECT COUNT(*) FROM player WHERE club_id = ?::uuid AND number = ?";
-//        try (Connection conn = dataSource.getConnection();
-//             PreparedStatement stmt = conn.prepareStatement(sql)) {
-//            stmt.setObject(1, clubId);
-//            stmt.setInt(2, number);
-//            ResultSet rs = stmt.executeQuery();
-//            return rs.next() && rs.getInt(1) > 0;
-//        } catch (SQLException e) {
-//            throw new RuntimeException("Error checking player number in club", e);
-//        }
-//    }
+    public void savePlayerStat(String playerId) {
+        String query = """
+                         INSERT INTO player_statistics (season_id, player_id, scored_goals, playing_time_seconds)
+                        VALUES (0, ?, 0, 0)
+                        ON CONFLICT (player_id)
+                        DO UPDATE SET scored_goals = player_statistics.scored_goals + 1
+                       """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setObject(1, UUID.fromString(playerId));
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error while incrementing player goals", e);
+        }}
 
     public boolean existsByClubIdAndNumber(String clubId, int number) {
         try (Connection conn = dataSource.getConnection();
@@ -161,27 +198,33 @@ public class PlayerCrudOperations {
         return rs.next();
          } catch (SQLException e) {
            throw new RuntimeException("Error checking player number in club", e);
-        }// retourne true s'il y a un résultat
+        }
     }
-
-
 
     public List<StatPlayerRest> getStat() {
         List<StatPlayerRest> statPlayerRest = new ArrayList<>();
+        String sql = """
+        SELECT p.id, p.name, p.number, p.position, p.nationality, p.age, 
+               ps.scored_goals, ps.playing_time_seconds
+        FROM player_statistics ps
+        JOIN player p ON ps.player_id = p.id
+        JOIN season s ON s.id = ps.season_id
+        WHERE s.year = (SELECT MAX(year) FROM season)
+    """;
+
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT p.id, p.name, p.number, p.position, p.nationality, p.age, ps.scored_goals, ps.playing_time_seconds FROM player_statistics ps JOIN player p on ps.player_id = p.id JOIN season s on s.id=ps.season_id")) {
-           ;
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    statPlayerRest.add(statsplayersMapper.apply(resultSet));
-                }
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                statPlayerRest.add(statsplayersMapper.apply(resultSet));
             }
+
             return statPlayerRest;
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
-
-
 
 }

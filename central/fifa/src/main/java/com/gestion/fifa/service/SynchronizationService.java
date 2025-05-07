@@ -16,15 +16,24 @@ public class SynchronizationService {
     private final ChampionshipClient championshipClient;
 
     public void synchronizeData() {
-//        Integer seasonYear = request.getSeasonYear();
-
-        List<StatClub> clubStats = championshipClient.fetchClubStatistics();
-        List<StatPlayer> playerStats = championshipClient.fetchPlayerStatistics();
+        List<String> championships = List.of("bundesliga", "premier-league", "ligue-1", "seria-A", "la-liga");
 
         statCrudOperations.deleteClubStats();
         statCrudOperations.deletePlayerStats();
 
-        statCrudOperations.insertClubStats(clubStats);
-        statCrudOperations.insertPlayerStats(playerStats);
+        for (String championship : championships) {
+            try {
+                List<StatClub> clubStats = championshipClient.fetchClubStatistics(championship);
+                List<StatPlayer> playerStats = championshipClient.fetchPlayerStatistics(championship);
+
+                statCrudOperations.insertClubStats(clubStats);
+                statCrudOperations.insertPlayerStats(playerStats);
+
+                System.out.println("Synchronization successful for championship: " + championship);
+            } catch (Exception e) {
+                System.err.println("Failed to synchronize data for championship: " + championship);
+                e.printStackTrace(); // Ou utilise un logger
+            }
+        }
     }
 }

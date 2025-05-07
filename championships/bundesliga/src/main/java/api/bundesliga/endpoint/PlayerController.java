@@ -21,13 +21,19 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class PlayerController {
     private final PlayerService playerService;
 
-    @GetMapping("/player")
+    @GetMapping("/players")
     public ResponseEntity<List<Player>> getPlayers(
-            @RequestParam(name = "page", defaultValue = "1", required = false) Integer page,
-            @RequestParam(name = "pageSize", defaultValue = "10", required = false) Integer pageSize) {
-        List<Player> players = playerService.getAll(page, pageSize);
+            @RequestParam(name = "page", defaultValue = "1") Integer page,
+            @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+            @RequestParam(name = "ageMinimum", required = false) Integer ageMin,
+            @RequestParam(name = "ageMaximum", required = false) Integer ageMax,
+            @RequestParam(name = "clubName", required = false) String clubName,
+            @RequestParam(name = "name", required = false) String playerName
+    ) {
+        List<Player> players = playerService.getAll(page, pageSize, ageMin, ageMax, clubName, playerName);
         return ResponseEntity.ok(players);
     }
+
 
     @PutMapping("/player")
     public ResponseEntity<Object> savePlayers(@RequestBody List<Player> players) {

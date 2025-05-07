@@ -1,9 +1,6 @@
 package api.bundesliga.service;
 
-import api.bundesliga.dao.operations.ClubCrudOperations;
-import api.bundesliga.dao.operations.MatchCrudOperations;
-import api.bundesliga.dao.operations.PlayerCrudOperations;
-import api.bundesliga.dao.operations.SeasonCrudOperations;
+import api.bundesliga.dao.operations.*;
 import api.bundesliga.endpoint.rest.GoalInput;
 import api.bundesliga.entity.*;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +21,8 @@ public class MatchService {
     private final PlayerCrudOperations playerCrudOperations;
     private final ClubCrudOperations clubCrudOperations;
     private final SeasonCrudOperations seasonCrudOperations;
+    private final GoalCrudOperations goalCrudOperations;
+    private final ClubStatisticsCrudOperations clubStatisticsCrudOperations;
 
     public List<Match> generateMatchsForSeason(Integer seasonYear) {
         Season season = seasonCrudOperations.findByYear(seasonYear);
@@ -138,5 +138,76 @@ public class MatchService {
                                     LocalDate after,
                                     LocalDate beforeOrEquals) {
         return matchCrudOperations.findBySeasonWithFilters(seasonYear, status, clubName, after, beforeOrEquals);
+    }
+
+
+    public void updateMatchStatus(UUID matchId, MatchStatus newStatus) throws SQLException {
+        MatchEntity match = matchCrudOperations.findById(matchId);
+        if (match == null) throw new IllegalArgumentException("Match not found");
+
+        MatchStatus currentStatus = match.getStatus();
+        if (!isValidStatusTransition(currentStatus, newStatus)) {
+            throw new IllegalArgumentException("Invalid status transition");
+        }
+
+        matchCrudOperations.updateStatus(matchId, newStatus);
+
+        if (newStatus == MatchStatus.FINISHED) {
+            List<Goal> goals = goalCrudOperations.findByMatchId(matchId);
+            updateStatistics(match, goals);
+        }
+    }
+
+  private boolean isValidStatusTransition(MatchStatus current, MatchStatus next) {
+        return (current == MatchStatus.NOT_STARTED && next == MatchStatus.STARTED)
+                || (current == MatchStatus.STARTED && next == MatchStatus.FINISHED);
+    }
+
+
+    private void updateStatistics(MatchEntity match, List<Goal> goals) throws SQLException {
+        UUID homeId = match.getClubHomeId();
+        UUID awayId = match.getClubAwayId();
+        UUID seasonId = match.getSeasonId();
+
+        int homeGoals = 0;
+        int awayGoals = 0;
+
+        for (Goal g : goals) {
+            boolean isHomeClub = g.getClubId().equals(homeId);
+            if (g.isOwnGoal()) {
+                if (isHomeClub) awayGoals++;
+                else homeGoals++;
+            } else {
+                if (isHomeClub) homeGoals++;
+                else awayGoals++;
+            }
+        }
+
+        ClubStatistics homeStats = clubStatisticsCrudOperations.findBySeasonAndClub(seasonId, homeId);
+        ClubStatistics awayStats = clubStatisticsCrudOperations.findBySeasonAndClub(seasonId, awayId);
+
+        homeStats.setScoredGoals(homeStats.getScoredGoals() + homeGoals);
+        homeStats.setConcededGoals(homeStats.getConcededGoals() + awayGoals);
+        homeStats.setDifferenceGoals(homeStats.getScoredGoals() - homeStats.getConcededGoals());
+        if (awayGoals == 0) homeStats.setCleanSheetNumber(homeStats.getCleanSheetNumber() + 1);
+
+        awayStats.setScoredGoals(awayStats.getScoredGoals() + awayGoals);
+        awayStats.setConcededGoals(awayStats.getConcededGoals() + homeGoals);
+        awayStats.setDifferenceGoals(awayStats.getScoredGoals() - awayStats.getConcededGoals());
+        if (homeGoals == 0) awayStats.setCleanSheetNumber(awayStats.getCleanSheetNumber() + 1);
+
+        int homePoints = computePoints(homeGoals, awayGoals);
+        int awayPoints = computePoints(awayGoals, homeGoals);
+        homeStats.setRankingPoints(homeStats.getRankingPoints() + homePoints);
+        awayStats.setRankingPoints(awayStats.getRankingPoints() + awayPoints);
+
+        clubStatisticsCrudOperations.save(homeStats);
+        clubStatisticsCrudOperations.save(awayStats);
+    }
+
+    private int computePoints(int goalsFor, int goalsAgainst) {
+        if (goalsFor > goalsAgainst) return 3;
+        if (goalsFor == goalsAgainst) return 1;
+        return 0;
     }
 }
