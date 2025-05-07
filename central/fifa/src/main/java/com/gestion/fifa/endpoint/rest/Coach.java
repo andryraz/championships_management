@@ -1,4 +1,5 @@
-package com.gestion.fifa.dto;
+// Coach.java
+package com.gestion.fifa.rest;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,9 +8,9 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class CoachInfo {
+@NoArgsConstructor
+public class Coach {
     private String name;
     private String nationality;
 }
