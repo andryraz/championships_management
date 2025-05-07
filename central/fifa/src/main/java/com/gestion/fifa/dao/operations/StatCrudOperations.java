@@ -67,8 +67,8 @@ public class StatCrudOperations {
 
     public void insertClubStats(List<StatClub> clubStats) {
         String sql = """
-            INSERT INTO club_stats (id, name, acronym, championship_name, goals_scored, goals_conceded, goal_difference, clean_sheet_count)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO club_stats (id, name, acronym, championship_name, goals_scored, goals_conceded, goal_difference, clean_sheet_count, coach_name, nationality)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """;
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -81,6 +81,8 @@ public class StatCrudOperations {
                 stmt.setInt(6, club.getConceded_goals());
                 stmt.setInt(7, club.getDifference_goals());
                 stmt.setInt(8, club.getCleanSheetNumber());
+                stmt.setString(9, club.getCoach_name());
+                stmt.setString(10, club.getCoach_nationality());
                 stmt.addBatch();
             }
             stmt.executeBatch();
