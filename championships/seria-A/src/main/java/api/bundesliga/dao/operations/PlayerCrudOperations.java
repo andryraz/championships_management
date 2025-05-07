@@ -103,7 +103,7 @@ public class PlayerCrudOperations {
                         statement.setString(4, entityToSave.getPlayerPosition().name());
                         statement.setInt(5, entityToSave.getAge());
                         statement.setString(6, entityToSave.getNationality());
-                        statement.addBatch(); // group by batch so executed as one query in database
+                        statement.addBatch();
                     } catch (SQLException e) {
                         throw new RuntimeException(e);
                     }

@@ -54,7 +54,7 @@ public class SeasonCrudOperations {
                     try {
                         statement.setInt(1, entityToSave.getYear());
                         statement.setString(2, entityToSave.getAlias());
-                        statement.addBatch(); // group by batch so executed as one query in database
+                        statement.addBatch();
                     } catch (SQLException e) {
                         throw new RuntimeException(e);
                     }

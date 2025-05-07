@@ -1,4 +1,4 @@
-package api.bundesliga.service;
+package com.gestion.fifa.service;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -13,7 +13,7 @@ import java.io.IOException;
 @Component
 public class ApiKeyFilter extends OncePerRequestFilter {
 
-    @Value("${championship.api-key}")
+    @Value("${api.key}")
     private String expectedApiKey;
 
     @Override
@@ -21,16 +21,12 @@ public class ApiKeyFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        String path = request.getRequestURI();
+        String requestApiKey = request.getHeader("X-API-KEY");
 
-        if (path.startsWith("/clubs/statistics") || path.startsWith("/players/statistics")) {
-            String apiKey = request.getHeader("X-API-KEY");
-
-            if (apiKey == null || !apiKey.equals(expectedApiKey)) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Invalid api keys");
-                return;
-            }
+        if (requestApiKey == null || !requestApiKey.equals(expectedApiKey)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Unauthorized: missing or invalid API key");
+            return;
         }
 
         filterChain.doFilter(request, response);

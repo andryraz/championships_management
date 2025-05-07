@@ -210,7 +210,7 @@ public class PlayerCrudOperations {
         FROM player_statistics ps
         JOIN player p ON ps.player_id = p.id
         JOIN season s ON s.id = ps.season_id
-        WHERE s.year = (SELECT MIN(year) FROM season)
+        WHERE s.year = (SELECT MAX(year) FROM season)
     """;
 
         try (Connection connection = dataSource.getConnection();

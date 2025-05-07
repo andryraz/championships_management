@@ -224,7 +224,7 @@ public class ClubCrudOperations {
         FROM club_statistics cs
         JOIN club c ON c.id = cs.club_id
         JOIN season s ON s.id = cs.season_id
-        WHERE s.year = (SELECT MIN(year) FROM season)
+        WHERE s.year = (SELECT MAX(year) FROM season)
     """;
 
         try (Connection connection = dataSource.getConnection();
