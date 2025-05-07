@@ -16,12 +16,12 @@ import java.util.function.Function;
 @Component
 @RequiredArgsConstructor
 public class PlayerMapper implements Function<ResultSet, Player> {
-    //private final ClubCrudOperations clubCrudOperations;
+
 
     @SneakyThrows
     @Override
     public Player apply(ResultSet resultSet) {
-       //String id = resultSet.getString("id");
+
 
         Player player = new Player();
         player.setId(resultSet.getString("id"));
@@ -30,8 +30,6 @@ public class PlayerMapper implements Function<ResultSet, Player> {
         player.setNationality(resultSet.getString("nationality"));
         player.setNumber(resultSet.getInt("number"));
         player.setAge(resultSet.getInt("age"));
-       // Club club = clubCrudOperations.findById(id);
-        //player.setClub(club);
         return player;
     }
 }

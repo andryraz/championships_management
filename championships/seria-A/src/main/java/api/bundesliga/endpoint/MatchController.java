@@ -56,18 +56,6 @@ public class MatchController {
         return ResponseEntity.ok(match);
     }
 
-//    @PutMapping("/matches/{id}/status")
-//    public ResponseEntity<Void> updateMatchStatus(@PathVariable UUID id, @RequestBody MatchUpdateStatus request) {
-//        try {
-//            matchService.updateMatchStatus(id, request.getStatus());
-//            return ResponseEntity.ok().build();
-//        } catch (IllegalArgumentException e) {
-//            return ResponseEntity.badRequest().build();
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
-//    }
-
     @PutMapping("/matches/{id}/status")
     public ResponseEntity<Void> updateMatchStatus(@PathVariable UUID id, @RequestBody MatchUpdateStatus request) {
         try {

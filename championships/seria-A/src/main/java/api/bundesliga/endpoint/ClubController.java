@@ -38,13 +38,6 @@ public class ClubController {
         return ResponseEntity.ok(clubs);
     }
 
-//    @GetMapping("/clubs/{id}/players")
-//    public ResponseEntity<List<Player>> getPlayerById(
-//           @PathVariable("id") String id
-//   ) {
-//       return ResponseEntity.ok(clubService.getPlayerByIdClub(id));
-//    }
-
     @GetMapping("/clubs/{id}/players")
     public ResponseEntity<List<PlayerRest>> getPlayerById(@PathVariable("id") String id) {
         List<Player> players = clubService.getPlayerByIdClub(id);
@@ -97,7 +90,7 @@ public class ClubController {
         } catch (IllegalArgumentException | EntityNotFoundException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
-            e.printStackTrace(); // Affiche la stack trace complète dans la console
+            e.printStackTrace();
             return ResponseEntity.internalServerError().body(Map.of("error", "Unexpected error"));
         }
     }

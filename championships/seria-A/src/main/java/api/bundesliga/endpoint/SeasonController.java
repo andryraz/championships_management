@@ -42,7 +42,6 @@ public class SeasonController {
         } catch (ServerException e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
-
     }
 
     @PutMapping("/seasons/{seasonYear}/status")

@@ -35,6 +35,9 @@ public class ChampionshipClient {
     @Value("${championship.seria.port}")
     private int seriaPort;
 
+    @Value("${championship.la-liga.port}")
+    private int ligaPort;
+
     @Value("${championship.api-key}")
     private String apiKey;
 
@@ -88,6 +91,7 @@ public class ChampionshipClient {
             case "seria" -> seriaPort;
             case "premier-league" -> premierLeaguePort;
             case "ligue-1" -> ligue1Port;
+            case "la-liga" -> ligaPort;
             default -> throw new ChampionshipSyncException("Championnat inconnu : " + championship);
         };
     }

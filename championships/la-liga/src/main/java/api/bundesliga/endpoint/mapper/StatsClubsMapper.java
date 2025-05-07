@@ -24,7 +24,6 @@ public class StatsClubsMapper implements Function<ResultSet, StatClubRest> {
         statClub.setYear_creation(resultSet.getInt("year_creation"));
         statClub.setStadium(resultSet.getString("stadium"));
 
-
         Coach coach = Coach.builder()
                 .name(resultSet.getString("coach_name"))
                 .nationality(resultSet.getString("coach_nationality"))

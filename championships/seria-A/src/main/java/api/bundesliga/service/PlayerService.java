@@ -67,44 +67,6 @@ public class PlayerService {
 
     }
 
-
-//    public List<Player> savePlayerOnClub(String clubId, List<PlayerRest> players) {
-//        Club club = clubCrudOperations.findById(clubId);
-//        if (club == null) {
-//            throw new EntityNotFoundException("Club not found");
-//        }
-//
-//        List<Player> addedPlayers = new ArrayList<>();
-//
-//        for (PlayerRest playerRest : players) {
-//            if (playerCrudOperations.existsByClubIdAndNumber(clubId, playerRest.getNumber())) {
-//                throw new IllegalArgumentException("Player number " + playerRest.getNumber() + " already used in this club");
-//            }
-//
-//            Player player = new Player();
-//            player.setId(UUID.randomUUID().toString());
-//            player.setName(playerRest.getName());
-//            player.setNumber(playerRest.getNumber());
-//            player.setNationality(playerRest.getNationality());
-//            player.setAge(playerRest.getAge());
-//            player.setPlayerPosition(playerRest.getPlayerPosition());
-//            player.setClub(club);
-//
-//            addedPlayers.add(player);
-//
-//            transfertCrudOperations.saveMovement(Transfert.builder()
-//                    .id(UUID.randomUUID().toString())
-//                    .playerId(player.getId())
-//                    .clubId(club.getId())
-//                    .movementType(MouvementType.IN)
-//                    .transferDate(LocalDateTime.now())
-//                    .build());
-//        }
-//
-//        return playerCrudOperations.saveAll(addedPlayers);
-//    }
-
-
     public List<StatPlayerRest> getStat() {
         return playerCrudOperations.getStat();
     }

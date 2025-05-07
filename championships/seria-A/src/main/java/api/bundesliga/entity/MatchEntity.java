@@ -13,7 +13,6 @@ import java.util.UUID;
 @Builder
 @Data
 public class MatchEntity {
-
     private UUID id;
     private UUID clubHomeId;
     private UUID clubAwayId;
