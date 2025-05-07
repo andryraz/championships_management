@@ -1,5 +1,5 @@
 // Coach.java
-package com.gestion.fifa.rest;
+package com.gestion.fifa.endpoint.rest;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

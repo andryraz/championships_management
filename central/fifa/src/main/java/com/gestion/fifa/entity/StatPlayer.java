@@ -1,6 +1,6 @@
 package com.gestion.fifa.entity;
 
-import com.gestion.fifa.dto.PlayerPosition;
+import com.gestion.fifa.endpoint.rest.PlayerPosition;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

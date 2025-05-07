@@ -1,9 +1,9 @@
 package com.gestion.fifa.service;
 
 import com.gestion.fifa.dao.operations.PlayerCrudOperations;
-import com.gestion.fifa.dto.DurationUnit;
-import com.gestion.fifa.dto.PlayerRanking;
-import com.gestion.fifa.dto.PlayingTime;
+import com.gestion.fifa.endpoint.rest.DurationUnit;
+import com.gestion.fifa.endpoint.rest.PlayerRanking;
+import com.gestion.fifa.endpoint.rest.PlayingTime;
 import com.gestion.fifa.entity.StatPlayer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

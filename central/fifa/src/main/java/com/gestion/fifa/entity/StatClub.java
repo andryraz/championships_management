@@ -1,12 +1,11 @@
 package com.gestion.fifa.entity;
 
 
-import com.gestion.fifa.dto.Coach;
+import com.gestion.fifa.endpoint.rest.Coach;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 @AllArgsConstructor
 @NoArgsConstructor
