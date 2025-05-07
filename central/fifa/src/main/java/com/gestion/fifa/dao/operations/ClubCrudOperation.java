@@ -1,10 +1,8 @@
 package com.gestion.fifa.dao.operations;
 
 import com.gestion.fifa.dao.DataSource;
-import com.gestion.fifa.dto.Club;
+import com.gestion.fifa.dao.mapper.ClubMapper;
 import com.gestion.fifa.dto.ClubRanking;
-import com.gestion.fifa.dto.Coach;
-import com.gestion.fifa.service.exception.ServerException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -20,6 +18,7 @@ import java.util.List;
 public class ClubCrudOperation {
 
     private final DataSource dataSource;
+    private final ClubMapper mapper;
 
     public List<ClubRanking> findTopClubs(int top) {
         List<ClubRanking> rankings = new ArrayList<>();
@@ -38,33 +37,12 @@ public class ClubCrudOperation {
 
             int rank = 1;
             while (rs.next()) {
-                Club club = Club.builder()
-                        .id(rs.getString("id"))
-                        .name(rs.getString("name"))
-                        .acronym(rs.getString("acronym"))
-                        .yearCreation(rs.getInt("year_creation"))
-                        .stadium(rs.getString("stadium"))
-                        .coach(Coach.builder()
-                                .name(rs.getString("coach_name"))
-                                .nationality(rs.getString("coach_nationality"))
-                                .build())
-                        .build();
-
-                ClubRanking clubRanking = ClubRanking.builder()
-                        .rank(rank++)
-                        .club(club)
-                        .rankingPoints(rs.getInt("ranking_points"))
-                        .scoredGoals(rs.getInt("goals_scored"))
-                        .concededGoals(rs.getInt("goals_conceded"))
-                        .differenceGoals(rs.getInt("goal_difference"))
-                        .cleanSheetNumber(rs.getInt("clean_sheet_count"))
-                        .build();
-
-                rankings.add(clubRanking);
+                rankings.add(mapper.apply(rs, rank++));
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            throw new RuntimeException("Failed to fetch top clubs", e);
         }
 
         return rankings;
