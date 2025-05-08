@@ -1,4 +1,4 @@
-CREATE TABLE season if not exists (
+CREATE TABLE if not exists season (
                         id UUID PRIMARY KEY,
                         year INT NOT NULL,
                         alias VARCHAR(20),

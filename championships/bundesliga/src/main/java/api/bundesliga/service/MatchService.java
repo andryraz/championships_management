@@ -39,7 +39,7 @@ public class MatchService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Matches are already generated for this season");
         }
 
-        List<Club> allClubs = clubCrudOperations.getAll(1, 10);
+        List<Club> allClubs = clubCrudOperations.getAllClubs();
 
         List<Match> matches = new ArrayList<>();
 

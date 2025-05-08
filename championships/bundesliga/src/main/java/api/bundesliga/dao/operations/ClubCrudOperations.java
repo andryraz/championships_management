@@ -52,6 +52,25 @@ public class ClubCrudOperations {
         }
     }
 
+    //without pagination
+
+    public List<Club> getAllClubs() {
+        List<Club> clubs = new ArrayList<>();
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "SELECT c.id, c.name, c.year_creation, c.acronym, c.stadium, c.coach_name, c.coach_nationality FROM club c ")) {
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    clubs.add(clubMapper.apply(resultSet));
+                }
+            }
+            return clubs;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @SneakyThrows
     public List<Club> saveAll(List<Club> entities) {
         List<Club> clubs = new ArrayList<>();
